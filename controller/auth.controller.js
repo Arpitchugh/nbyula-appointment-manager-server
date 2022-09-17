@@ -8,6 +8,9 @@ import {
 	findUserByEmailService,
 } from '../services/user.service.js';
 import { sendEmail } from '../utils/email.util.js';
+import lodash from 'lodash';
+import { verifyJWT } from '../utils/jwt.util.js';
+import { findSessionByIdService } from '../services/session.service.js';
 
 export async function signupHandler(req, res) {
 	const { name, email, password } = req.body;
@@ -113,6 +116,40 @@ export async function loginHandler(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
+}
+
+export async function logoutHandler(req, res) {
+	try {
+		const refreshToken = req.headers['x-refresh'];
+
+		const decoded = verifyJWT(refreshToken, 'refreshTokenPublicKey');
+
+		if (!decoded) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				error: 'Invalid refresh token',
+			});
+		}
+
+		const session = await findSessionByIdService(decoded.session);
+
+		if (!session || !session.valid) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				error: 'Session is not valid',
+			});
+		}
+
+		session.valid = false;
+
+		await session.save();
+
+		res.status(StatusCodes.OK).json({
+			message: 'User logged out successfully',
+		});
+	} catch (err) {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});

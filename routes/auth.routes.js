@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
 	loginHandler,
+	logoutHandler,
 	signupHandler,
 	verifyUserHandler,
 } from '../controller/auth.controller.js';
@@ -20,5 +21,6 @@ authRouter.get(
 	validateRequest(verifyUserSchema),
 	verifyUserHandler
 );
+authRouter.get('/auth/logout', logoutHandler);
 
 export default authRouter;
