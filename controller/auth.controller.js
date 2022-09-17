@@ -199,7 +199,43 @@ export async function forgotPasswordHandler(req, res) {
 			message: 'Password verification code sent successfully to your email',
 		});
 	} catch (err) {
-		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
+}
+
+export async function resetPasswordHandler(req, res) {
+	const { email, passwordResetCode } = req.params;
+	const { password } = req.body;
+
+	try {
+		const user = await findUserByEmailService(email);
+
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({
+				error: 'User not found',
+			});
+		}
+
+		if (
+			!user?.passwordResetCode ||
+			user?.passwordResetCode !== passwordResetCode
+		) {
+			return res.status(StatusCodes.FORBIDDEN).json({
+				error: 'Invalid password reset code',
+			});
+		}
+
+		user.passwordResetCode = null;
+		user.password = password;
+		await user.save();
+
+		return res.status(StatusCodes.OK).json({
+			message: 'Password reset successfully',
+		});
+	} catch (err) {
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
 	}

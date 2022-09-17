@@ -53,3 +53,30 @@ export const forgotPasswordSchema = z.object({
 			.email('Please enter a valid email'),
 	}),
 });
+
+export const resetPasswordSchema = z.object({
+	params: z.object({
+		email: z
+			.string({ required_error: 'email is required' })
+			.email('Please provide a valid email'),
+		passwordResetCode: z.string({
+			required_error: 'passwordResetCode is required',
+		}),
+	}),
+	body: z
+		.object({
+			password: z
+				.string({ required_error: 'password is required' })
+				.min(4, 'password should be longer than 4 characters')
+				.max(30, 'password can not be longer than 30 characters'),
+
+			cpassword: z
+				.string({ required_error: 'cpassword is required' })
+				.min(4, 'password should be longer than 4 characters')
+				.max(30, 'password can not be longer than 30 characters'),
+		})
+		.refine(data => data.password === data.cpassword, {
+			message: 'Password and confirm password do not match',
+			path: ['cpassword'],
+		}),
+});
