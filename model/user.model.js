@@ -2,6 +2,12 @@ import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
 
+export const userPrivateFields = [
+	'password',
+	'verificationCode',
+	'passwordResetCode',
+];
+
 const userSchema = new mongoose.Schema(
 	{
 		name: { type: String, required: true },

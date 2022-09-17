@@ -34,3 +34,14 @@ export const verifyUserSchema = z.object({
 			.email('Please enter a valid email'),
 	}),
 });
+
+export const loginSchema = z.object({
+	body: z.object({
+		email: z
+			.string({ required_error: 'Email is required' })
+			.email('Invalid email or password'),
+		password: z
+			.string({ required_error: 'password is required' })
+			.min(6, 'Invalid email or password'),
+	}),
+});

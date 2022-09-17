@@ -1,5 +1,9 @@
 import { StatusCodes } from 'http-status-codes';
 import {
+	signAccessTokenService,
+	signRefreshTokenService,
+} from '../services/auth.service.js';
+import {
 	createUserService,
 	findUserByEmailService,
 } from '../services/user.service.js';
@@ -64,6 +68,52 @@ export async function verifyUserHandler(req, res) {
 		});
 	} catch (err) {
 		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
+}
+
+export async function loginHandler(req, res) {
+	try {
+		const { email, password } = req.body;
+
+		const user = await findUserByEmailService(email);
+
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({
+				error: 'User not found',
+			});
+		}
+
+		// check if user is verified
+		if (!user.verified) {
+			return res.status(StatusCodes.FORBIDDEN).json({
+				error: 'Please verify your email',
+			});
+		}
+
+		// check if password is correct
+		const isPasswordValid = await user.comparePassword(password);
+
+		if (!isPasswordValid) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				error: 'Invalid credentials',
+			});
+		}
+
+		// sign access token
+		const accessToken = signAccessTokenService(user);
+
+		const refreshToken = await signRefreshTokenService({ userId: user._id });
+
+		return res.status(StatusCodes.OK).json({
+			message: 'User logged in successfully',
+			access_token: accessToken,
+			refresh_token: refreshToken,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
 	}
