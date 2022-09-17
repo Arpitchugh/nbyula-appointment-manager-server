@@ -2,15 +2,18 @@ import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
 
-const userSchema = new mongoose.Schema({
-	name: { type: String, required: true },
-	email: { type: String, required: true, unique: true },
-	password: { type: String, required: true },
-	following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-	verificationCode: { type: String, required: true, default: () => nanoid() },
-	passwordResetCode: { type: String, default: null },
-	verified: { type: Boolean, default: false },
-});
+const userSchema = new mongoose.Schema(
+	{
+		name: { type: String, required: true },
+		email: { type: String, required: true, unique: true },
+		password: { type: String, required: true },
+		following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+		verificationCode: { type: String, required: true, default: () => nanoid() },
+		passwordResetCode: { type: String, default: null },
+		verified: { type: Boolean, default: false },
+	},
+	{ timestamps: true }
+);
 
 userSchema.pre('save', async function (next) {
 	let user = this;
@@ -30,6 +33,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 	return bcrypt.compare(candidatePassword, user.password).catch(e => false);
 };
 
-const UserModel = mongoose.model('User', userSchema);
+const UserModel = new mongoose.model('User', userSchema);
 
 export default UserModel;

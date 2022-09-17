@@ -7,3 +7,11 @@ import UserModel from '../model/user.model.js';
 export function createUserService(payload) {
 	return UserModel.create(payload);
 }
+
+/**
+ * Find a user from database with given email
+ * @param email email of the user which will be used to find user
+ */
+export function findUserByEmailService(email) {
+	return UserModel.findOne({ email });
+}

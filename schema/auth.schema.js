@@ -23,3 +23,14 @@ export const signupSchema = z.object({
 			path: ['cpassword'],
 		}),
 });
+
+export const verifyUserSchema = z.object({
+	params: z.object({
+		verificationCode: z.string({
+			required_error: 'verificationCode is required',
+		}),
+		email: z
+			.string({ required_error: 'email is required' })
+			.email('Please enter a valid email'),
+	}),
+});
