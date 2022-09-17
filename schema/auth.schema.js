@@ -45,3 +45,11 @@ export const loginSchema = z.object({
 			.min(6, 'Invalid email or password'),
 	}),
 });
+
+export const forgotPasswordSchema = z.object({
+	body: z.object({
+		email: z
+			.string({ required_error: 'email is required' })
+			.email('Please enter a valid email'),
+	}),
+});

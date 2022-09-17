@@ -10,6 +10,7 @@ import {
 import { sendEmail } from '../utils/email.util.js';
 import { verifyJWT } from '../utils/jwt.util.js';
 import { findSessionByIdService } from '../services/session.service.js';
+import { nanoid } from 'nanoid';
 
 export async function signupHandler(req, res) {
 	const { name, email, password } = req.body;
@@ -162,4 +163,44 @@ export function getCurrentUserHandler(req, res) {
 		message: user ? 'User logged in successfully' : 'User not logged in',
 		user: user || null,
 	});
+}
+
+export async function forgotPasswordHandler(req, res) {
+	const { email } = req.body;
+
+	try {
+		const user = await findUserByEmailService(email);
+
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({
+				error: 'User not found please check if your email is correct',
+			});
+		}
+
+		if (!user.verified) {
+			return res.status(StatusCodes.FORBIDDEN).json({
+				error: 'User is not verified',
+			});
+		}
+
+		const passwordResetCode = nanoid();
+
+		user.passwordResetCode = passwordResetCode;
+
+		await user.save();
+
+		sendEmail(
+			email,
+			'Password Reset Verification Code',
+			`Your verification code is:- ${passwordResetCode}`
+		);
+
+		return res.status(StatusCodes.OK).json({
+			message: 'Password verification code sent successfully to your email',
+		});
+	} catch (err) {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
 }
