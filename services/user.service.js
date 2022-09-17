@@ -15,3 +15,11 @@ export function createUserService(payload) {
 export function findUserByEmailService(email) {
 	return UserModel.findOne({ email });
 }
+
+/**
+ * Find a user from database with given id
+ * @param id id of the user which will be used to find user
+ */
+export function findUserByIdService(id) {
+	return UserModel.findById(id);
+}

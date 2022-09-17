@@ -4,6 +4,7 @@ import {
 	getCurrentUserHandler,
 	loginHandler,
 	logoutHandler,
+	refreshAccessTokenHandler,
 	resetPasswordHandler,
 	signupHandler,
 	verifyUserHandler,
@@ -33,6 +34,7 @@ authRouter.get(
 );
 authRouter.get('/auth/logout', logoutHandler);
 authRouter.get('/auth/me', getCurrentUserHandler);
+authRouter.get('/auth/refresh', refreshAccessTokenHandler);
 authRouter.patch(
 	'/auth/resetpassword/:email/:passwordResetCode',
 	validateRequest(resetPasswordSchema),
