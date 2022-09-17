@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import cors from 'cors';
 import authRouter from './routes/auth.routes.js';
+import deserializeUser from './middleware/deserializeUser.middleware.js';
 
 config();
 
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
+app.use('/api', deserializeUser);
 app.use('/api', authRouter);
 
 mongoose.connect(process.env.DB_URI, () => {

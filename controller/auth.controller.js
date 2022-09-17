@@ -8,7 +8,6 @@ import {
 	findUserByEmailService,
 } from '../services/user.service.js';
 import { sendEmail } from '../utils/email.util.js';
-import lodash from 'lodash';
 import { verifyJWT } from '../utils/jwt.util.js';
 import { findSessionByIdService } from '../services/session.service.js';
 
@@ -154,4 +153,13 @@ export async function logoutHandler(req, res) {
 			error: 'Internal Server Error',
 		});
 	}
+}
+
+export function getCurrentUserHandler(req, res) {
+	const { user } = res.locals;
+
+	return res.status(StatusCodes.OK).json({
+		message: user ? 'User logged in successfully' : 'User not logged in',
+		user: user || null,
+	});
 }
