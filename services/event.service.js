@@ -15,3 +15,11 @@ export function createEventService(payload) {
 export function getAllEventsService(query) {
 	return EventModel.find(query || {});
 }
+
+/**
+ * Get event by id from database
+ * @param {*} id is the id of the event
+ */
+export function findEventById(id) {
+	return EventModel.findById(id);
+}

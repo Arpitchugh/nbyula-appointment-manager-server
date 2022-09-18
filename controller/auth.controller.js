@@ -116,7 +116,6 @@ export async function loginHandler(req, res) {
 			refresh_token: refreshToken,
 		});
 	} catch (err) {
-		console.log(err);
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
@@ -159,10 +158,6 @@ export async function logoutHandler(req, res) {
 
 export function getCurrentUserHandler(req, res) {
 	const { user } = res.locals;
-
-	console.log('====================================');
-	console.log(user);
-	console.log('====================================');
 
 	if (!user) {
 		return res.status(StatusCodes.FORBIDDEN).json({

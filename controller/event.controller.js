@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import {
 	createEventService,
+	findEventById,
 	getAllEventsService,
 } from '../services/event.service.js';
 import { findUserByIdService } from '../services/user.service.js';
@@ -50,13 +51,17 @@ export async function createEventHandler(req, res) {
 
 export async function getEventForUserHandler(req, res) {
 	try {
-		const user = await findUserByIdService(res.locals.user._id).populate(
-			'events'
+		const user = await findUserByIdService(res.locals.user._id);
+
+		const events = await Promise.all(
+			user.events.map(async id => {
+				return await findEventById(id).populate('organizer').populate('guests');
+			})
 		);
 
 		return res.status(StatusCodes.OK).json({
 			message: 'Events fetched successfully',
-			records: user.events,
+			records: events,
 		});
 	} catch (err) {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
