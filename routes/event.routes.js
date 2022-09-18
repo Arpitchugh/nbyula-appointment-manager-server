@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { createEventHandler } from '../controller/event.controller.js';
+import {
+	createEventHandler,
+	getAllEventsHandler,
+} from '../controller/event.controller.js';
 import validateRequest from '../middleware/validateRequest.middleware.js';
 import { createEventSchema } from '../schema/event.schema.js';
 
@@ -10,5 +13,6 @@ eventRouter.post(
 	validateRequest(createEventSchema),
 	createEventHandler
 );
+eventRouter.get('/events', getAllEventsHandler);
 
 export default eventRouter;

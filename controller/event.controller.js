@@ -1,5 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import { createEventService } from '../services/event.service.js';
+import {
+	createEventService,
+	getAllEventsService,
+} from '../services/event.service.js';
 import { findUserByIdService } from '../services/user.service.js';
 import { sendEmail } from '../utils/email.util.js';
 import moment from 'moment';
@@ -36,6 +39,21 @@ export async function createEventHandler(req, res) {
 
 		return res.status(StatusCodes.CREATED).json({
 			message: 'Event created successfully',
+		});
+	} catch (err) {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
+}
+
+export async function getAllEventsHandler(req, res) {
+	try {
+		const allEvents = await getAllEventsService().populate('organizer');
+
+		return res.status(StatusCodes.OK).json({
+			message: 'Events fetched successfully',
+			records: allEvents,
 		});
 	} catch (err) {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
