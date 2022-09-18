@@ -81,6 +81,9 @@ export async function createEventHandler(req, res) {
 			message: 'Event created successfully',
 		});
 	} catch (err) {
+		console.log('====================================');
+		console.log(err);
+		console.log('====================================');
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});

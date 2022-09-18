@@ -9,6 +9,7 @@ import {
 	signupHandler,
 	verifyUserHandler,
 } from '../controller/auth.controller.js';
+import requireLogin from '../middleware/requireLogin.middleware.js';
 import validateRequest from '../middleware/validateRequest.middleware.js';
 import {
 	forgotPasswordSchema,
@@ -32,8 +33,8 @@ authRouter.get(
 	validateRequest(verifyUserSchema),
 	verifyUserHandler
 );
-authRouter.get('/auth/logout', logoutHandler);
-authRouter.get('/auth/me', getCurrentUserHandler);
+authRouter.get('/auth/logout', requireLogin, logoutHandler);
+authRouter.get('/auth/me', requireLogin, getCurrentUserHandler);
 authRouter.get('/auth/refresh', refreshAccessTokenHandler);
 authRouter.patch(
 	'/auth/resetpassword/:email/:passwordResetCode',
