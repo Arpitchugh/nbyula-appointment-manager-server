@@ -81,7 +81,7 @@ export async function loginHandler(req, res) {
 	try {
 		const { email, password } = req.body;
 
-		const user = await findUserByEmailService(email).populate('events');
+		const user = await findUserByEmailService(email);
 
 		if (!user) {
 			return res.status(StatusCodes.NOT_FOUND).json({
@@ -271,9 +271,7 @@ export async function refreshAccessTokenHandler(req, res) {
 			});
 		}
 
-		const user = await findUserByIdService(session.user.toString()).populate(
-			'events'
-		);
+		const user = await findUserByIdService(session.user.toString());
 
 		if (!user) {
 			return res.status(StatusCodes.NOT_FOUND).json({
