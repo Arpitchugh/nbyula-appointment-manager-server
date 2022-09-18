@@ -9,16 +9,17 @@ import moment from 'moment';
 
 export async function createEventHandler(req, res) {
 	try {
-		const { title, agenda, startTime, endTime, guests } = req.body;
-		const formattedStartTime = moment(startTime).format('DD-MM-YYYY hh:mm A');
+		const { title, agenda, start, end, guests } = req.body;
+		const formattedStartTime = moment(start).format('DD-MM-YYYY hh:mm A');
+		const formattedEndTime = moment(end).format('DD-MM-YYYY hh:mm A');
 
 		const user = await findUserByIdService(res.locals.user._id);
 
 		const createdEvent = await createEventService({
 			title,
 			agenda,
-			startTime: new Date(startTime).toISOString(),
-			endTime: new Date(endTime).toISOString(),
+			start: new Date(start).toString(),
+			end: new Date(end).toString(),
 			guests,
 			organizer: user._id,
 		});
@@ -33,7 +34,7 @@ export async function createEventHandler(req, res) {
 			sendEmail(
 				guestUser.email,
 				`New Event with ${user.name}`,
-				`You have been invited to a new event by ${user.name} at ${formattedStartTime}`
+				`You have been invited to a new event by ${user.name} from ${formattedStartTime} to ${formattedEndTime}`
 			);
 		});
 
@@ -41,19 +42,24 @@ export async function createEventHandler(req, res) {
 			message: 'Event created successfully',
 		});
 	} catch (err) {
+		console.log('====================================');
+		console.log(err);
+		console.log('====================================');
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
 	}
 }
 
-export async function getAllEventsHandler(req, res) {
+export async function getEventForUserHandler(req, res) {
 	try {
-		const allEvents = await getAllEventsService().populate('organizer');
+		const user = await findUserByIdService(res.locals.user._id).populate(
+			'events'
+		);
 
 		return res.status(StatusCodes.OK).json({
 			message: 'Events fetched successfully',
-			records: allEvents,
+			records: user.events,
 		});
 	} catch (err) {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
