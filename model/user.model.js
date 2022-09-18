@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
 		verificationCode: { type: String, required: true, default: () => nanoid() },
 		passwordResetCode: { type: String, default: null },
 		verified: { type: Boolean, default: false },
+		events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
 	},
 	{ timestamps: true }
 );
