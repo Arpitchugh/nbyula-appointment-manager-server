@@ -81,7 +81,7 @@ export async function loginHandler(req, res) {
 	try {
 		const { email, password } = req.body;
 
-		const user = await findUserByEmailService(email);
+		const user = await findUserByEmailService(email).populate('events');
 
 		if (!user) {
 			return res.status(StatusCodes.NOT_FOUND).json({
@@ -159,6 +159,16 @@ export async function logoutHandler(req, res) {
 
 export function getCurrentUserHandler(req, res) {
 	const { user } = res.locals;
+
+	console.log('====================================');
+	console.log(user);
+	console.log('====================================');
+
+	if (!user) {
+		return res.status(StatusCodes.FORBIDDEN).json({
+			error: 'User is not logged in',
+		});
+	}
 
 	return res.status(StatusCodes.OK).json({
 		message: user ? 'User logged in successfully' : 'User not logged in',
@@ -261,7 +271,9 @@ export async function refreshAccessTokenHandler(req, res) {
 			});
 		}
 
-		const user = await findUserByIdService(session.user.toString());
+		const user = await findUserByIdService(session.user.toString()).populate(
+			'events'
+		);
 
 		if (!user) {
 			return res.status(StatusCodes.NOT_FOUND).json({
@@ -275,7 +287,6 @@ export async function refreshAccessTokenHandler(req, res) {
 			access_token: accessToken,
 		});
 	} catch (err) {
-		console.log(err);
 		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
