@@ -23,3 +23,12 @@ export function findUserByEmailService(email) {
 export function findUserByIdService(id) {
 	return UserModel.findById(id);
 }
+
+/**
+ * Find all users from database with given query
+ *
+ * @param {object | undefined} query filters which will be used to find users
+ */
+export function findAllUsersService(query) {
+	return UserModel.find(query || {});
+}
