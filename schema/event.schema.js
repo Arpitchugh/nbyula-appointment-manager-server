@@ -9,3 +9,9 @@ export const createEventSchema = z.object({
 		guests: z.array(z.string({ required_error: 'guests is required' })),
 	}),
 });
+
+export const deleteEventSchema = z.object({
+	params: z.object({
+		id: z.string({ required_error: 'id is required' }),
+	}),
+});

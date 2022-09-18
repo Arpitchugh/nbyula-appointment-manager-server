@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
 	createEventHandler,
+	deleteEventHandler,
 	getEventForUserHandler,
 } from '../controller/event.controller.js';
 import validateRequest from '../middleware/validateRequest.middleware.js';
@@ -14,5 +15,6 @@ eventRouter.post(
 	createEventHandler
 );
 eventRouter.get('/events', getEventForUserHandler);
+eventRouter.delete('/events/:id', deleteEventHandler);
 
 export default eventRouter;

@@ -32,3 +32,13 @@ export function findUserByIdService(id) {
 export function findAllUsersService(query) {
 	return UserModel.find(query || {});
 }
+
+/**
+ * Find a user from database with given id and update it
+ * 
+ * @param {*} id id of the user which will be used to find user
+ * @param {*} payload payload which will be used to update user
+ */
+export function findUserByIdAndUpdateService(id, payload) {
+	return UserModel.findByIdAndUpdate(id, payload, { new: true });
+}

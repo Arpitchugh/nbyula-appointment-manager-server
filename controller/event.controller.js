@@ -2,11 +2,14 @@ import { StatusCodes } from 'http-status-codes';
 import {
 	createEventService,
 	findEventById,
-	getAllEventsService,
 } from '../services/event.service.js';
-import { findUserByIdService } from '../services/user.service.js';
+import {
+	findUserByIdAndUpdateService,
+	findUserByIdService,
+} from '../services/user.service.js';
 import { sendEmail } from '../utils/email.util.js';
 import moment from 'moment';
+import lodash from 'lodash';
 
 export async function createEventHandler(req, res) {
 	try {
@@ -53,6 +56,12 @@ export async function getEventForUserHandler(req, res) {
 	try {
 		const user = await findUserByIdService(res.locals.user._id);
 
+		if (!user) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				error: 'Please login to view your events',
+			});
+		}
+
 		const events = await Promise.all(
 			user.events.map(async id => {
 				return await findEventById(id).populate('organizer').populate('guests');
@@ -62,6 +71,50 @@ export async function getEventForUserHandler(req, res) {
 		return res.status(StatusCodes.OK).json({
 			message: 'Events fetched successfully',
 			records: events,
+		});
+	} catch (err) {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: 'Internal Server Error',
+		});
+	}
+}
+
+export async function deleteEventHandler(req, res) {
+	try {
+		const { id } = req.params;
+		const event = await findEventById(id);
+		const currentUser = res.locals.user._id;
+
+		if (!event) {
+			return res.status(StatusCodes.NOT_FOUND).json({
+				error: 'Event not found',
+			});
+		}
+
+		if (currentUser && currentUser !== event.organizer.toString()) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				error: 'You are not authorized to delete this event',
+			});
+		}
+
+		// delete event from guests
+		event.guests.forEach(async guest => {
+			await findUserByIdAndUpdateService(guest, {
+				$pull: { events: event._id },
+			});
+		});
+
+		// remove event from organizer
+		const organizer = await findUserByIdService(event.organizer);
+
+		await findUserByIdAndUpdateService(organizer._id, {
+			$pull: { events: event._id },
+		});
+
+		await event.remove();
+
+		return res.status(StatusCodes.OK).json({
+			message: 'Event deleted successfully',
 		});
 	} catch (err) {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
