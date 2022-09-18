@@ -14,8 +14,8 @@ export async function createEventHandler(req, res) {
 		const createdEvent = await createEventService({
 			title,
 			agenda,
-			startTime,
-			endTime,
+			startTime: new Date(startTime).toISOString(),
+			endTime: new Date(endTime).toISOString(),
 			guests,
 			organizer: user._id,
 		});
