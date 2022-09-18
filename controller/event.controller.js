@@ -81,9 +81,6 @@ export async function createEventHandler(req, res) {
 			message: 'Event created successfully',
 		});
 	} catch (err) {
-		console.log('====================================');
-		console.log(err);
-		console.log('====================================');
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
@@ -131,7 +128,7 @@ export async function deleteEventHandler(req, res) {
 
 		if (currentUser && currentUser !== event.organizer.toString()) {
 			return res.status(StatusCodes.UNAUTHORIZED).json({
-				error: 'You are not authorized to delete this event',
+				error: 'Only organizer can delete the event',
 			});
 		}
 

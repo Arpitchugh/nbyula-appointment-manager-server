@@ -150,6 +150,9 @@ export async function logoutHandler(req, res) {
 			message: 'User logged out successfully',
 		});
 	} catch (err) {
+		console.log('====================================');
+		console.log(err);
+		console.log('====================================');
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
