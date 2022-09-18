@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
 		passwordResetCode: { type: String, default: null },
 		verified: { type: Boolean, default: false },
 		events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+		blockedTime: [],
 	},
 	{ timestamps: true }
 );

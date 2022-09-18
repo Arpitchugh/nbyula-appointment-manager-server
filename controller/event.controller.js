@@ -9,17 +9,19 @@ import {
 } from '../services/user.service.js';
 import { sendEmail } from '../utils/email.util.js';
 import moment from 'moment';
-import lodash from 'lodash';
 
 export async function createEventHandler(req, res) {
 	try {
-		const { title, agenda, start, end, guests } = req.body;
-		const formattedStartTime = moment(start).format('DD-MM-YYYY hh:mm A');
-		const formattedEndTime = moment(end).format('DD-MM-YYYY hh:mm A');
+		const { title, agenda, start, end, guests, type } = req.body;
+		const formattedStartTime = moment(new Date(start)).format(
+			'DD-MM-YYYY hh:mm A'
+		);
+		const formattedEndTime = moment(new Date(end)).format('DD-MM-YYYY hh:mm A');
 
 		const user = await findUserByIdService(res.locals.user._id);
 
 		const createdEvent = await createEventService({
+			type,
 			title,
 			agenda,
 			start: new Date(start).toString(),
@@ -31,16 +33,18 @@ export async function createEventHandler(req, res) {
 		user.events.push(createdEvent._id);
 		await user.save();
 
-		guests.forEach(async guest => {
-			const guestUser = await findUserByIdService(guest);
-			guestUser.events.push(createdEvent._id);
-			await guestUser.save();
-			sendEmail(
-				guestUser.email,
-				`New Event with ${user.name}`,
-				`You have been invited to a new event by ${user.name} from ${formattedStartTime} to ${formattedEndTime}`
-			);
-		});
+		if (guests && guests.length > 0) {
+			guests.forEach(async guest => {
+				const guestUser = await findUserByIdService(guest);
+				guestUser.events.push(createdEvent._id);
+				await guestUser.save();
+				sendEmail(
+					guestUser.email,
+					`New Event with ${user.name}`,
+					`You have been invited to a new event by ${user.name} from ${formattedStartTime} to ${formattedEndTime}`
+				);
+			});
+		}
 
 		return res.status(StatusCodes.CREATED).json({
 			message: 'Event created successfully',

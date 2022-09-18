@@ -2,8 +2,14 @@ import mongoose from 'mongoose';
 
 const eventSchema = new mongoose.Schema(
 	{
-		title: { type: String, required: true },
-		agenda: { type: String, required: true },
+		title: { type: String },
+		type: {
+			type: String,
+			required: true,
+			default: 'appointment',
+			enum: ['appointment', 'block'],
+		},
+		agenda: { type: String },
 		start: { type: String, required: true },
 		end: { type: String, required: true },
 		guests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
