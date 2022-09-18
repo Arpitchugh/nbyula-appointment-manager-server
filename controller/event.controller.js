@@ -20,6 +20,36 @@ export async function createEventHandler(req, res) {
 
 		const user = await findUserByIdService(res.locals.user._id);
 
+		if (guests && guests.length > 0) {
+			for (let i = 0; i < guests.length; i++) {
+				const guestUser = await findUserByIdService(guests[i]).populate(
+					'events'
+				);
+
+				for (let j = 0; j < guestUser.events.length; j++) {
+					const event = guestUser.events[j];
+
+					if (event.type === 'block') {
+						const isEventOverlapping =
+							moment(new Date(start)).isBetween(
+								new Date(event.start),
+								new Date(event.end)
+							) ||
+							moment(new Date(end)).isBetween(
+								new Date(event.start),
+								new Date(event.end)
+							);
+
+						if (isEventOverlapping) {
+							return res.status(StatusCodes.CONFLICT).json({
+								error: `Event cannot be created as ${guestUser.name} is busy at that time`,
+							});
+						}
+					}
+				}
+			}
+		}
+
 		const createdEvent = await createEventService({
 			type,
 			title,
@@ -35,7 +65,8 @@ export async function createEventHandler(req, res) {
 
 		if (guests && guests.length > 0) {
 			guests.forEach(async guest => {
-				const guestUser = await findUserByIdService(guest);
+				const guestUser = await findUserByIdService(guests);
+
 				guestUser.events.push(createdEvent._id);
 				await guestUser.save();
 				sendEmail(
@@ -50,6 +81,9 @@ export async function createEventHandler(req, res) {
 			message: 'Event created successfully',
 		});
 	} catch (err) {
+		console.log('====================================');
+		console.log(err);
+		console.log('====================================');
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: 'Internal Server Error',
 		});
