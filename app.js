@@ -29,5 +29,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 mongoose.connect(process.env.DB_URI, () => {
-	app.listen(8000);
+	app.listen(process.env.PORT || 8000);
 });
