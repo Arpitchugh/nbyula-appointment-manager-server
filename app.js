@@ -23,9 +23,20 @@ app.use('/api', eventRouter);
 app.use('/api', userRouter);
 
 if (process.env.NODE_ENV === 'production') {
-	app.use(express.static(path.resolve('..', 'client', 'build')));
+	app.use(
+		express.static(
+			path.resolve('..', 'nbyula-appointment-manager-client', 'build')
+		)
+	);
 	app.use('*', (req, res) => {
-		res.sendFile(path.resolve('..', 'client', 'build', 'index.html'));
+		res.sendFile(
+			path.resolve(
+				'..',
+				'nbyula-appointment-manager-client',
+				'build',
+				'index.html'
+			)
+		);
 	});
 }
 
