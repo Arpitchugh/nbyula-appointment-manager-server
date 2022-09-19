@@ -21,6 +21,13 @@ app.use('/api', authRouter);
 app.use('/api', eventRouter);
 app.use('/api', userRouter);
 
+if (process.env.NODE_ENV === 'production') {
+	app.use(express.static('../client/build'));
+	app.use('*', (req, res) => {
+		res.sendFile('../client/build/index.html');
+	});
+}
+
 mongoose.connect(process.env.DB_URI, () => {
 	app.listen(8000);
 });
