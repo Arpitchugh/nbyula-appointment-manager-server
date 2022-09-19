@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes.js';
 import eventRouter from './routes/event.routes.js';
 import userRouter from './routes/user.routes.js';
 import deserializeUser from './middleware/deserializeUser.middleware.js';
+import path from 'path';
 
 config();
 
@@ -22,9 +23,9 @@ app.use('/api', eventRouter);
 app.use('/api', userRouter);
 
 if (process.env.NODE_ENV === 'production') {
-	app.use(express.static('../client/build'));
+	app.use(express.static(path.resolve('..', 'client', 'build')));
 	app.use('*', (req, res) => {
-		res.sendFile('../client/build/index.html');
+		res.sendFile(path.resolve('..', 'client', 'build', 'index.html'));
 	});
 }
 
