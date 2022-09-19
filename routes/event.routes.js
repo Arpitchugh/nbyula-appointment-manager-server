@@ -10,13 +10,11 @@ import { createEventSchema } from '../schema/event.schema.js';
 
 const eventRouter = Router();
 
-eventRouter.post(
-	'/events',
-	requireLogin,
-	validateRequest(createEventSchema),
-	createEventHandler
-);
-eventRouter.get('/events', requireLogin, getEventForUserHandler);
+eventRouter
+	.route('/events')
+	.post(requireLogin, validateRequest(createEventSchema), createEventHandler)
+	.get(requireLogin, getEventForUserHandler);
+
 eventRouter.delete('/events/:id', requireLogin, deleteEventHandler);
 
 export default eventRouter;
